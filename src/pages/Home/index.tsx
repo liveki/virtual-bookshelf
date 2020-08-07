@@ -175,7 +175,7 @@ const Home: React.FC = () => {
         </Box>
 
         <Box component="div" className={styles.booksWantToReadContainer}>
-          <Link to="/" className={styles.link}>
+          <Link to="/category-list/reading" className={styles.link}>
             Estou lendo <FaArrowRight size={20} />
           </Link>
           <Box component="div" className={styles.booksWantToReadContent}>
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
         </Box>
 
         <Box component="div" className={styles.booksWantToReadContainer}>
-          <Link to="/" className={styles.link}>
+          <Link to="/category-list/want-to-read" className={styles.link}>
             Vou ler <FaArrowRight size={20} />
           </Link>
           <Box component="div" className={styles.booksWantToReadContent}>
@@ -249,7 +249,7 @@ const Home: React.FC = () => {
         </Box>
 
         <Box component="div" className={styles.booksWantToReadContainer}>
-          <Link to="/" className={styles.link}>
+          <Link to="/category-list/read" className={styles.link}>
             Já li <FaArrowRight size={20} />
           </Link>
           <Box component="div" className={styles.booksWantToReadContent}>

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { HTMLAttributes } from 'react';
 
 import { Header } from './styles';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-interface headerProps {
+interface headerProps extends HTMLAttributes<HTMLHeadElement> {
   description?: string;
   backControl?: boolean;
 }
@@ -12,11 +12,16 @@ interface headerProps {
 const PageHeader: React.FC<headerProps> = ({
   description,
   backControl = false,
+  children,
 }) => {
   return (
     <Header>
       <h1>Virtual Bookshelf</h1>
-      {description && <span>{description}</span>}
+      {description && (
+        <span>
+          {description} {children}{' '}
+        </span>
+      )}
       {backControl && (
         <Link to="/">
           <FaArrowLeft size={30} />
