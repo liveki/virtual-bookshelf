@@ -1,26 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { ApplicationState } from '../../store';
+import { loadRequest } from '../../store/ducks/categories/actions';
 import PageHeader from '../../components/PageHeader';
 import {
   Box,
   Input,
   makeStyles,
   createStyles,
-  FormControl,
-  MenuItem,
   Theme,
-  Select,
-  InputLabel,
-  FormLabel,
-  RadioGroup,
-  Radio,
-  FormControlLabel,
   Card,
   CardContent,
-  Typography,
 } from '@material-ui/core';
 import { BookFilter, Button } from './styles';
 import { FaPlus, FaArrowRight } from 'react-icons/fa';
 import { Link, useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { CategoriesState } from '../../store/ducks/categories/types';
 
 const useStyle = makeStyles((theme: Theme) =>
   createStyles({
@@ -114,6 +109,8 @@ const useStyle = makeStyles((theme: Theme) =>
 const Home: React.FC = () => {
   const styles = useStyle();
   const history = useHistory();
+
+  loadRequest();
 
   const handleBookRegister = () => {
     history.push('/book-manager');

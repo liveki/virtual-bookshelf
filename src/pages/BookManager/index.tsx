@@ -79,7 +79,7 @@ const BookManager: React.FC = () => {
           <Input id="author" className={styles.input} />
 
           <InputLabel htmlFor="imageUrl" className={styles.inputLabel}>
-            URL da imagem (opicional)
+            URL da imagem (opcional)
           </InputLabel>
           <Input
             id="imageUrl"
