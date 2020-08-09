@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ApplicationState } from '../../store';
-import { loadRequest } from '../../store/ducks/categories/actions';
+import { toDate, format } from 'date-fns';
+import * as categoryActions from '../../store/ducks/categories/actions';
+import * as bookActions from '../../store/ducks/books/actions';
 import PageHeader from '../../components/PageHeader';
 import {
   Box,
@@ -14,8 +16,20 @@ import {
 import { BookFilter, Button } from './styles';
 import { FaPlus, FaArrowRight } from 'react-icons/fa';
 import { Link, useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { CategoriesState } from '../../store/ducks/categories/types';
+import { useSelector, useDispatch } from 'react-redux';
+import { Category } from '../../store/ducks/categories/types';
+
+export interface FormattedBook {
+  id: string;
+  created_at: number;
+  title: string;
+  description: string;
+  author: string;
+  category?: Category;
+  deleted: boolean;
+  img_url?: string;
+  formattedDate: string;
+}
 
 const useStyle = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,7 +80,7 @@ const useStyle = makeStyles((theme: Theme) =>
       marginLeft: '1.5rem',
     },
     cardCreatedAtText: {
-      font: '500 1.8rem Roboto',
+      font: '300 1.8rem Roboto',
       color: '#7D4715',
       marginTop: '2.9rem',
       marginLeft: '1.5rem',
@@ -109,16 +123,34 @@ const useStyle = makeStyles((theme: Theme) =>
 const Home: React.FC = () => {
   const styles = useStyle();
   const history = useHistory();
+  const dispatch = useDispatch();
+  const { books } = useSelector((state: ApplicationState) => state);
 
-  loadRequest();
+  useEffect(() => {
+    function loadResources() {
+      dispatch(categoryActions.loadRequest());
+      dispatch(bookActions.loadRequest());
+    }
+    loadResources();
+  }, [dispatch]);
 
   const handleBookRegister = () => {
     history.push('/book-manager');
   };
 
-  const handleBookDetail = () => {
-    history.push('/book-detail');
+  const handleBookDetail = (book: FormattedBook) => {
+    history.push(`/book-detail/`, { formattedBook: book });
   };
+
+  const formattedBooks: FormattedBook[] = useMemo(() => {
+    return books.data.map((book) => {
+      const parsedDate = toDate(book.created_at);
+      return {
+        ...book,
+        formattedDate: format(parsedDate, 'dd/MM/y'),
+      };
+    });
+  }, [books.data]);
 
   return (
     <Box component="div" className={styles.container}>
@@ -138,37 +170,23 @@ const Home: React.FC = () => {
         </Button>
 
         <Box component="div" className={styles.booksWithoutCategory}>
-          <Card className={styles.card} onClick={handleBookDetail}>
-            <CardContent className={styles.cardContent}>
-              <img
-                src="https://images-na.ssl-images-amazon.com/images/I/51IA2UEqA-L._SX332_BO1,204,203,200_.jpg"
-                alt="capa"
-                className={styles.cardImg}
-              />
-              <Box component="div" className={styles.cardTextContainer}>
-                <strong className={styles.cardText}>
-                  Harry Potter e o Prisioneiro de Azkaban
-                </strong>
-                <span className={styles.cardCreatedAtText}>06/08/2020</span>
-              </Box>
-            </CardContent>
-          </Card>
-
-          <Card className={styles.card}>
-            <CardContent className={styles.cardContent}>
-              <img
-                src="https://images-na.ssl-images-amazon.com/images/I/51IA2UEqA-L._SX332_BO1,204,203,200_.jpg"
-                alt="capa"
-                className={styles.cardImg}
-              />
-              <Box component="div" className={styles.cardTextContainer}>
-                <strong className={styles.cardText}>
-                  Harry Potter e o Prisioneiro de Azkaban
-                </strong>
-                <span className={styles.cardCreatedAtText}>06/08/2020</span>
-              </Box>
-            </CardContent>
-          </Card>
+          {formattedBooks.map((book) => (
+            <Card
+              className={styles.card}
+              onClick={() => handleBookDetail(book)}
+              key={book.id}
+            >
+              <CardContent className={styles.cardContent}>
+                <img src={book.img_url} alt="capa" className={styles.cardImg} />
+                <Box component="div" className={styles.cardTextContainer}>
+                  <strong className={styles.cardText}>{book.title}</strong>
+                  <span className={styles.cardCreatedAtText}>
+                    {book.formattedDate}
+                  </span>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
         </Box>
 
         <Box component="div" className={styles.booksWantToReadContainer}>

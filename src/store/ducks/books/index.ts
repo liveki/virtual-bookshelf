@@ -16,10 +16,17 @@ const reducer: Reducer<BooksState> = (state = INITIAL_STATE, action) => {
         ...state,
         loading: false,
         error: false,
-        data: action.payload.data,
+        data: action.payload,
       };
-    case BooksTypes.LOAD_FAILURE:
-      return { ...state, loading: false, error: true, data: [] };
+    case BooksTypes.CREATE_REQUEST:
+      return state;
+    case BooksTypes.CREATE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: [...state.data, action.payload.data],
+      };
     default:
       return state;
   }

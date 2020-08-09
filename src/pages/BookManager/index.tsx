@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState, FormEvent, useCallback } from 'react';
+import * as bookActions from '../../store/ducks/books/actions';
+
 import {
   Box,
   makeStyles,
   createStyles,
   InputLabel,
   Input,
-  TextareaAutosize,
 } from '@material-ui/core';
 import PageHeader from '../../components/PageHeader';
 import { Button } from './styles';
+import { useDispatch } from 'react-redux';
 const useStyle = makeStyles(() =>
   createStyles({
     container: {
@@ -49,7 +51,23 @@ const useStyle = makeStyles(() =>
 const BookManager: React.FC = () => {
   const styles = useStyle();
 
-  const handleSave = () => {};
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [author, setAuthor] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
+
+  const dispatch = useDispatch();
+
+  const handleSave = useCallback(() => {
+    return dispatch(
+      bookActions.createRequest({
+        title,
+        description,
+        author,
+        img_url: imgUrl,
+      })
+    );
+  }, [dispatch, title, description, author, imgUrl]);
 
   return (
     <Box component="div" className={styles.container}>
@@ -65,18 +83,33 @@ const BookManager: React.FC = () => {
           <InputLabel htmlFor="title" className={styles.inputLabel}>
             Título *
           </InputLabel>
-          <Input id="title" className={styles.input} />
+          <Input
+            id="title"
+            className={styles.input}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
           <InputLabel htmlFor="description" className={styles.inputLabel}>
             Descrição *
           </InputLabel>
 
-          <textarea className={styles.textArea} id="description" />
+          <textarea
+            className={styles.textArea}
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
           <InputLabel htmlFor="author" className={styles.inputLabel}>
             Autor *
           </InputLabel>
-          <Input id="author" className={styles.input} />
+          <Input
+            id="author"
+            className={styles.input}
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
 
           <InputLabel htmlFor="imageUrl" className={styles.inputLabel}>
             URL da imagem (opcional)
@@ -87,9 +120,11 @@ const BookManager: React.FC = () => {
             style={{
               marginBottom: '2rem',
             }}
+            value={imgUrl}
+            onChange={(e) => setImgUrl(e.target.value)}
           />
 
-          <Button type="button">Salvar</Button>
+          <Button type="submit">Salvar</Button>
         </form>
       </Box>
     </Box>

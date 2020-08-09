@@ -16,7 +16,7 @@ const reducer: Reducer<CategoriesState> = (state = INITIAL_STATE, action) => {
         ...state,
         loading: false,
         error: false,
-        data: action.payload.data,
+        data: action.payload,
       };
     case CategoriesTypes.LOAD_FAILURE:
       return { ...state, loading: false, error: true, data: [] };

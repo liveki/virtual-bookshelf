@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { FormattedBook } from '../Home';
 import {
   makeStyles,
   createStyles,
@@ -10,6 +11,14 @@ import {
 import PageHeader from '../../components/PageHeader';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { ButtonsContainer, Button } from './styles';
+import { useRouteMatch, useLocation } from 'react-router-dom';
+import { Book } from '../../store/ducks/books/types';
+import { ApplicationState } from '../../store';
+import { useSelector } from 'react-redux';
+
+interface LocationProps {
+  formattedBook: FormattedBook;
+}
 
 const useStyle = makeStyles(() =>
   createStyles({
@@ -122,36 +131,30 @@ const useStyle = makeStyles(() =>
 
 const BookDetail: React.FC = () => {
   const styles = useStyle();
+
+  const { formattedBook } = useLocation<LocationProps>().state;
+
   return (
     <Box component="div" className={styles.container}>
       <PageHeader backControl />
       <Box component="div" id="container">
         <Box component="div" className={styles.bookContainer}>
-          <img
-            src="https://images-na.ssl-images-amazon.com/images/I/91wJzyhRfkL.jpg"
-            alt="capa"
-            className={styles.img}
-          />
+          <img src={formattedBook.img_url} alt="capa" className={styles.img} />
           <Box component="div" className={styles.bookDetail}>
             <strong>Título:</strong>
-            <span>As crônicas de Nárnia</span>
+            <span>{formattedBook.title}</span>
 
             <strong>Descrição:</strong>
-            <p>
-              Viagens ao fim do mundo, criaturas fantásticas e batalhas épicas
-              entre o bem e o mal - o que mais um leitor poderia querer de um
-              livro? O livro que tem tudo isso é 'O leão, a feiticeira e o
-              guarda-roupa'.
-            </p>
+            <p>{formattedBook.description}</p>
 
             <strong>Autor:</strong>
-            <span>Clive Staples Lewis</span>
+            <span>{formattedBook.author}</span>
 
             <strong>Criado em:</strong>
-            <span>06/08/2020</span>
+            <span>{formattedBook.formattedDate}</span>
 
             <strong>Categoria</strong>
-            <span>Estou lendo</span>
+            <span>{formattedBook.category?.name}</span>
 
             <ButtonsContainer>
               <Button>
