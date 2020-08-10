@@ -12,3 +12,15 @@ export const createRequest = (data: BookDTO) =>
 
 export const createSuccess = (data: Book) =>
   action(BooksTypes.CREATE_SUCCESS, data);
+
+export const saveRequest = (data: Book) =>
+  action(BooksTypes.UPDATE_REQUEST, data);
+
+export const saveSuccess = (data: Book[]) =>
+  action(BooksTypes.UPDATE_SUCCESS, data);
+
+export const removeRequest = (id: string) =>
+  action(BooksTypes.REMOVE_REQUEST, id);
+
+export const removeSuccess = (data: Book[]) =>
+  action(BooksTypes.REMOVE_SUCCESS, data);

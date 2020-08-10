@@ -6,7 +6,7 @@ interface buttomProps {
 
 export const ButtonsContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: flex-end;
 
   svg {

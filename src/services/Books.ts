@@ -50,3 +50,36 @@ export const load = () => {
 
   return JSON.parse(JSONBooks) as Book[];
 };
+
+export const save = (book: Book) => {
+  const { books } = store.getState();
+
+  const findIndex = books.data.findIndex((findBook) => findBook.id === book.id);
+
+  if (findIndex > -1) {
+    books.data[findIndex] = book;
+    localStorage.setItem(
+      '@VirtualBookshelf:books',
+      JSON.stringify([...books.data])
+    );
+
+    return books.data;
+  }
+};
+
+export const remove = (id: string) => {
+  const { books } = store.getState();
+
+  const findIndex = books.data.findIndex((book) => book.id === id);
+
+  if (findIndex > -1) {
+    books.data[findIndex].deleted = true;
+    localStorage.setItem(
+      '@VirtualBookshelf:books',
+      JSON.stringify([...books.data])
+    );
+  }
+
+  console.log(books.data);
+  return books.data;
+};

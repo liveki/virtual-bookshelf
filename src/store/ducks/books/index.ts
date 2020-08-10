@@ -25,8 +25,21 @@ const reducer: Reducer<BooksState> = (state = INITIAL_STATE, action) => {
         ...state,
         loading: false,
         error: false,
-        data: [...state.data, action.payload.data],
+        data: [...state.data, action.payload],
       };
+    case BooksTypes.UPDATE_REQUEST:
+      return { ...state, loading: true };
+    case BooksTypes.UPDATE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: action.payload,
+      };
+    case BooksTypes.REMOVE_REQUEST:
+      return { ...state, loading: true };
+    case BooksTypes.REMOVE_SUCCESS:
+      return { ...state, loading: false, error: false, data: action.payload };
     default:
       return state;
   }

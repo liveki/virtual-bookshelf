@@ -5,10 +5,10 @@ export const load = () => {
   const newCategories: Category[] = [];
 
   if (!findCategories) {
-    newCategories.push({ id: '1', name: 'none' });
-    newCategories.push({ id: '2', name: 'wantToRead' });
-    newCategories.push({ id: '3', name: 'reading' });
-    newCategories.push({ id: '4', name: 'read' });
+    newCategories.push({ id: 'none', name: 'Sem categoria' });
+    newCategories.push({ id: 'wantToRead', name: 'Vou ler' });
+    newCategories.push({ id: 'reading', name: 'Estou lendo' });
+    newCategories.push({ id: 'read', name: 'Já li' });
 
     localStorage.setItem(
       '@VirtualBookshelf:categories',

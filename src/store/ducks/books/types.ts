@@ -5,6 +5,10 @@ export enum BooksTypes {
   LOAD_SUCCESS = '@books/LOAD_SUCCESS',
   CREATE_REQUEST = '@books/CREATE_REQUEST',
   CREATE_SUCCESS = '@books/CREATE_SUCCESS',
+  UPDATE_REQUEST = '@books/UPDATE_REQUEST',
+  UPDATE_SUCCESS = '@books/UPDATE_SUCCESS',
+  REMOVE_REQUEST = '@books/REMOVE_REQUEST',
+  REMOVE_SUCCESS = '@books/REMOVE_SUCCESS',
 }
 
 export interface Book {
@@ -13,7 +17,7 @@ export interface Book {
   title: string;
   description: string;
   author: string;
-  category?: Category;
+  category: Category;
   deleted: boolean;
   img_url?: string;
 }

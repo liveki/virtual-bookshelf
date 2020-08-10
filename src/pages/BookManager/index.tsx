@@ -1,6 +1,4 @@
-import React, { useState, FormEvent, useCallback } from 'react';
-import * as bookActions from '../../store/ducks/books/actions';
-
+import React, { useState, useCallback, useEffect, FormEvent } from 'react';
 import {
   Box,
   makeStyles,
@@ -9,8 +7,13 @@ import {
   Input,
 } from '@material-ui/core';
 import PageHeader from '../../components/PageHeader';
+import * as bookActions from '../../store/ducks/books/actions';
 import { Button } from './styles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, useRouteMatch } from 'react-router-dom';
+import { ApplicationState } from '../../store';
+import { Category } from '../../store/ducks/categories/types';
+
 const useStyle = makeStyles(() =>
   createStyles({
     container: {
@@ -48,26 +51,85 @@ const useStyle = makeStyles(() =>
   })
 );
 
+interface RouteParams {
+  id: string;
+}
+
 const BookManager: React.FC = () => {
   const styles = useStyle();
-
+  const [id, setId] = useState('');
+  const [createdAt, setCreatedAt] = useState(0);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [author, setAuthor] = useState('');
+  const [category, setCategory] = useState<Category>({} as Category);
+  const [deleted, setDeleted] = useState(false);
   const [imgUrl, setImgUrl] = useState('');
 
   const dispatch = useDispatch();
+  const history = useHistory();
+  const { params } = useRouteMatch<RouteParams>();
+  const { data: books } = useSelector((state: ApplicationState) => state.books);
 
-  const handleSave = useCallback(() => {
-    return dispatch(
-      bookActions.createRequest({
-        title,
-        description,
-        author,
-        img_url: imgUrl,
-      })
-    );
-  }, [dispatch, title, description, author, imgUrl]);
+  useEffect(() => {
+    if (params.id) {
+      const findBook = books.find((book) => book.id === params.id);
+      if (findBook) {
+        setId(findBook.id);
+        setCreatedAt(findBook.created_at);
+        setTitle(findBook.title);
+        setDescription(findBook.description);
+        setAuthor(findBook.author);
+        setCategory(findBook.category);
+        setDeleted(findBook.deleted);
+        setImgUrl(findBook.img_url ? findBook.img_url : '');
+      }
+    }
+  }, [books, params.id]);
+
+  const handleSave = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (params.id) {
+        dispatch(
+          bookActions.saveRequest({
+            author,
+            category,
+            created_at: createdAt,
+            deleted,
+            description,
+            id,
+            title,
+            img_url: imgUrl,
+          })
+        );
+      } else {
+        dispatch(
+          bookActions.createRequest({
+            author,
+            description,
+            title,
+            img_url: imgUrl,
+          })
+        );
+      }
+      history.push('/');
+    },
+    [
+      author,
+      category,
+      createdAt,
+      deleted,
+      description,
+      dispatch,
+      history,
+      id,
+      imgUrl,
+      params.id,
+      title,
+    ]
+  );
 
   return (
     <Box component="div" className={styles.container}>

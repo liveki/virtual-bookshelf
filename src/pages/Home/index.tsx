@@ -3,6 +3,8 @@ import { ApplicationState } from '../../store';
 import { toDate, format } from 'date-fns';
 import * as categoryActions from '../../store/ducks/categories/actions';
 import * as bookActions from '../../store/ducks/books/actions';
+import * as commentActions from '../../store/ducks/comments/actions';
+
 import PageHeader from '../../components/PageHeader';
 import {
   Box,
@@ -19,13 +21,13 @@ import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Category } from '../../store/ducks/categories/types';
 
-export interface FormattedBook {
+export interface Book {
   id: string;
   created_at: number;
   title: string;
   description: string;
   author: string;
-  category?: Category;
+  category: Category;
   deleted: boolean;
   img_url?: string;
   formattedDate: string;
@@ -58,6 +60,7 @@ const useStyle = makeStyles((theme: Theme) =>
       height: '16.9rem',
       transition: 'transform 0.2s',
       cursor: 'pointer',
+      marginBottom: '2rem',
       '&:hover': {
         transform: 'translateY(-5px) translateX(5px)',
       },
@@ -91,6 +94,7 @@ const useStyle = makeStyles((theme: Theme) =>
       justifyContent: 'space-between',
       marginTop: '15.1rem',
       marginBottom: '9.6rem',
+      flexWrap: 'wrap',
     },
     link: {
       display: 'flex',
@@ -124,33 +128,58 @@ const Home: React.FC = () => {
   const styles = useStyle();
   const history = useHistory();
   const dispatch = useDispatch();
-  const { books } = useSelector((state: ApplicationState) => state);
+  const books = useSelector((state: ApplicationState) => state).books.data;
 
   useEffect(() => {
-    function loadResources() {
-      dispatch(categoryActions.loadRequest());
-      dispatch(bookActions.loadRequest());
-    }
-    loadResources();
+    dispatch(categoryActions.loadRequest());
+    dispatch(bookActions.loadRequest());
+    dispatch(commentActions.loadCommentsRequest());
   }, [dispatch]);
 
   const handleBookRegister = () => {
     history.push('/book-manager');
   };
 
-  const handleBookDetail = (book: FormattedBook) => {
-    history.push(`/book-detail/`, { formattedBook: book });
+  const handleBookDetail = (book: Book) => {
+    history.push('/book-detail', { formattedBook: book });
   };
 
-  const formattedBooks: FormattedBook[] = useMemo(() => {
-    return books.data.map((book) => {
+  const formattedBooks = useMemo(() => {
+    const parsedBooks = books.map((book) => {
       const parsedDate = toDate(book.created_at);
+
       return {
         ...book,
         formattedDate: format(parsedDate, 'dd/MM/y'),
       };
     });
-  }, [books.data]);
+
+    return parsedBooks;
+  }, [books]);
+
+  const filteredBooks = useMemo(() => {
+    return formattedBooks.filter((bookItem) => !bookItem.deleted);
+  }, [formattedBooks]);
+
+  const booksWithoutCategory = useMemo(() => {
+    return filteredBooks.filter((bookItem) => bookItem.category.id === 'none');
+  }, [filteredBooks]);
+
+  const wantToReadBooks = useMemo(() => {
+    return filteredBooks.filter(
+      (bookItem) => bookItem.category.id === 'wantToRead'
+    );
+  }, [filteredBooks]);
+
+  const readingBooks = useMemo(() => {
+    return filteredBooks.filter(
+      (bookItem) => bookItem.category.id === 'reading'
+    );
+  }, [filteredBooks]);
+
+  const readBooks = useMemo(() => {
+    return filteredBooks.filter((bookItem) => bookItem.category.id === 'read');
+  }, [filteredBooks]);
 
   return (
     <Box component="div" className={styles.container}>
@@ -170,7 +199,7 @@ const Home: React.FC = () => {
         </Button>
 
         <Box component="div" className={styles.booksWithoutCategory}>
-          {formattedBooks.map((book) => (
+          {booksWithoutCategory.map((book) => (
             <Card
               className={styles.card}
               onClick={() => handleBookDetail(book)}
@@ -189,114 +218,98 @@ const Home: React.FC = () => {
           ))}
         </Box>
 
-        <Box component="div" className={styles.booksWantToReadContainer}>
-          <Link to="/category-list/reading" className={styles.link}>
-            Estou lendo <FaArrowRight size={20} />
-          </Link>
-          <Box component="div" className={styles.booksWantToReadContent}>
-            <Card className={styles.card}>
-              <CardContent className={styles.cardContent}>
-                <img
-                  src="https://images-na.ssl-images-amazon.com/images/I/91wJzyhRfkL.jpg"
-                  alt="capa"
-                  className={styles.cardImg}
-                />
-                <Box component="div" className={styles.cardTextContainer}>
-                  <strong className={styles.cardText}>
-                    As crônicas de Nárnia
-                  </strong>
-                  <span className={styles.cardCreatedAtText}>06/08/2020</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card className={styles.card}>
-              <CardContent className={styles.cardContent}>
-                <img
-                  src="https://images-na.ssl-images-amazon.com/images/I/91wJzyhRfkL.jpg"
-                  alt="capa"
-                  className={styles.cardImg}
-                />
-                <Box component="div" className={styles.cardTextContainer}>
-                  <strong className={styles.cardText}>
-                    As crônicas de Nárnia
-                  </strong>
-                  <span className={styles.cardCreatedAtText}>06/08/2020</span>
-                </Box>
-              </CardContent>
-            </Card>
+        {readingBooks.length > 0 && (
+          <Box component="div" className={styles.booksWantToReadContainer}>
+            <Link to="/category-list/reading" className={styles.link}>
+              Estou lendo <FaArrowRight size={20} />
+            </Link>
+            <Box component="div" className={styles.booksWantToReadContent}>
+              {readingBooks.map((book) => (
+                <Card
+                  className={styles.card}
+                  key={book.id}
+                  onClick={() => handleBookDetail(book)}
+                >
+                  <CardContent className={styles.cardContent}>
+                    <img
+                      src={book.img_url}
+                      alt="capa"
+                      className={styles.cardImg}
+                    />
+                    <Box component="div" className={styles.cardTextContainer}>
+                      <strong className={styles.cardText}>{book.title}</strong>
+                      <span className={styles.cardCreatedAtText}>
+                        {book.formattedDate}
+                      </span>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
           </Box>
-        </Box>
+        )}
 
-        <Box component="div" className={styles.booksWantToReadContainer}>
-          <Link to="/category-list/want-to-read" className={styles.link}>
-            Vou ler <FaArrowRight size={20} />
-          </Link>
-          <Box component="div" className={styles.booksWantToReadContent}>
-            <Card className={styles.card}>
-              <CardContent className={styles.cardContent}>
-                <img
-                  src="https://lojasaraiva.vteximg.com.br/arquivos/ids/12109083/1006637057.jpg?v=637142248087230000"
-                  alt="capa"
-                  className={styles.cardImg}
-                />
-                <Box component="div" className={styles.cardTextContainer}>
-                  <strong className={styles.cardText}>A cabana</strong>
-                  <span className={styles.cardCreatedAtText}>06/08/2020</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card className={styles.card}>
-              <CardContent className={styles.cardContent}>
-                <img
-                  src="https://i2.wp.com/cenfewc.com.br/wp-content/uploads/2018/03/imagem-nao-disponivel.jpg?fit=600%2C600&ssl=1"
-                  alt="capa"
-                  className={styles.cardImg}
-                />
-                <Box component="div" className={styles.cardTextContainer}>
-                  <strong className={styles.cardText}>Náufrago</strong>
-                  <span className={styles.cardCreatedAtText}>06/08/2020</span>
-                </Box>
-              </CardContent>
-            </Card>
+        {wantToReadBooks.length > 0 && (
+          <Box component="div" className={styles.booksWantToReadContainer}>
+            <Link to="/category-list/want-to-read" className={styles.link}>
+              Vou ler <FaArrowRight size={20} />
+            </Link>
+            <Box component="div" className={styles.booksWantToReadContent}>
+              {wantToReadBooks.map((book) => (
+                <Card
+                  className={styles.card}
+                  key={book.id}
+                  onClick={() => handleBookDetail(book)}
+                >
+                  <CardContent className={styles.cardContent}>
+                    <img
+                      src={book.img_url}
+                      alt="capa"
+                      className={styles.cardImg}
+                    />
+                    <Box component="div" className={styles.cardTextContainer}>
+                      <strong className={styles.cardText}>{book.title}</strong>
+                      <span className={styles.cardCreatedAtText}>
+                        {book.formattedDate}
+                      </span>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
           </Box>
-        </Box>
+        )}
 
-        <Box component="div" className={styles.booksWantToReadContainer}>
-          <Link to="/category-list/read" className={styles.link}>
-            Já li <FaArrowRight size={20} />
-          </Link>
-          <Box component="div" className={styles.booksWantToReadContent}>
-            <Card className={styles.card}>
-              <CardContent className={styles.cardContent}>
-                <img
-                  src="https://lojasaraiva.vteximg.com.br/arquivos/ids/12109083/1006637057.jpg?v=637142248087230000"
-                  alt="capa"
-                  className={styles.cardImg}
-                />
-                <Box component="div" className={styles.cardTextContainer}>
-                  <strong className={styles.cardText}>A cabana</strong>
-                  <span className={styles.cardCreatedAtText}>06/08/2020</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card className={styles.card}>
-              <CardContent className={styles.cardContent}>
-                <img
-                  src="https://i2.wp.com/cenfewc.com.br/wp-content/uploads/2018/03/imagem-nao-disponivel.jpg?fit=600%2C600&ssl=1"
-                  alt="capa"
-                  className={styles.cardImg}
-                />
-                <Box component="div" className={styles.cardTextContainer}>
-                  <strong className={styles.cardText}>Náufrago</strong>
-                  <span className={styles.cardCreatedAtText}>06/08/2020</span>
-                </Box>
-              </CardContent>
-            </Card>
+        {readBooks.length > 0 && (
+          <Box component="div" className={styles.booksWantToReadContainer}>
+            <Link to="/category-list/read" className={styles.link}>
+              Já li <FaArrowRight size={20} />
+            </Link>
+            <Box component="div" className={styles.booksWantToReadContent}>
+              {readBooks.map((book) => (
+                <Card
+                  className={styles.card}
+                  key={book.id}
+                  onClick={() => handleBookDetail(book)}
+                >
+                  <CardContent className={styles.cardContent}>
+                    <img
+                      src={book.img_url}
+                      alt="capa"
+                      className={styles.cardImg}
+                    />
+                    <Box component="div" className={styles.cardTextContainer}>
+                      <strong className={styles.cardText}>{book.title}</strong>
+                      <span className={styles.cardCreatedAtText}>
+                        {book.formattedDate}
+                      </span>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </Box>
   );
