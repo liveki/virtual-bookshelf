@@ -13,9 +13,9 @@ yarn
 ### Running project
 To run the project, just execute one of the commands below:
 ```bash
-npm run dev
+npm start
 # ou com yarn
-yarn dev
+yarn start
 ```
 
 Dont worry. The project runs locally and uses its local storage to maintain resources.
