@@ -25,11 +25,21 @@ const reducer: Reducer<CommentsState> = (state = INITIAL_STATE, action) => {
     case CommentsTypes.SAVE_COMMENT_REQUEST:
       return { ...state, loading: true };
     case CommentsTypes.SAVE_COMMENT_SUCCESSS:
-      return { ...state, loading: false, error: false, data: action.payload };
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: [...state.data, action.payload],
+      };
     case CommentsTypes.REMOVE_COMMENT_REQUEST:
       return { ...state, loading: true };
     case CommentsTypes.REMOVE_COMMENT_SUCCESS:
-      return { ...state, loading: false, error: false, data: action.payload };
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: [...state.data, action.payload],
+      };
     default:
       return state;
   }

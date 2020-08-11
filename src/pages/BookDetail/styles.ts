@@ -8,9 +8,13 @@ export const ButtonsContainer = styled.div`
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
-
+  margin-top: 3rem;
+  margin-bottom: 2rem;
   svg {
     cursor: pointer;
+  }
+
+  @media (max-width: 700px) {
   }
 `;
 

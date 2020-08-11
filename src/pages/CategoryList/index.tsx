@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Box,
   makeStyles,
   createStyles,
-  Input,
   Card,
   CardContent,
 } from '@material-ui/core';
-import { BookFilter } from './styles';
+import { CategoryTitle } from './styles';
 import PageHeader from '../../components/PageHeader';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+import { Category } from '../../store/ducks/categories/types';
+import { ApplicationState } from '../../store';
+import { useSelector } from 'react-redux';
+import { toDate } from 'date-fns/esm';
+import { format } from 'date-fns';
+import { Book } from '../../store/ducks/books/types';
 
 const useStyle = makeStyles(() =>
   createStyles({
@@ -34,8 +39,10 @@ const useStyle = makeStyles(() =>
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginTop: '15.1rem',
+      paddingTop: '5rem',
+      marginTop: '0.5rem',
       marginBottom: '9.6rem',
+      borderTop: '2px solid rgba(125, 71, 21, 0.2)',
     },
     card: {
       background: '#FEE8CD',
@@ -67,7 +74,7 @@ const useStyle = makeStyles(() =>
       marginLeft: '1.5rem',
     },
     cardCreatedAtText: {
-      font: '500 1.8rem Roboto',
+      font: '300 1.8rem Roboto',
       color: '#7D4715',
       marginTop: '2.9rem',
       marginLeft: '1.5rem',
@@ -75,13 +82,36 @@ const useStyle = makeStyles(() =>
   })
 );
 
+interface LocationProps {
+  category: Category;
+}
+
 const CategoryList: React.FC = () => {
   const styles = useStyle();
   const history = useHistory();
+  const { category } = useLocation<LocationProps>().state;
+  const { books } = useSelector((state: ApplicationState) => state);
 
-  const handleBookDetail = () => {
-    history.push('/book-detail');
+  const handleBookDetail = (book: Book) => {
+    history.push('/book-detail', { formattedBook: book });
   };
+
+  const filteredBooks = useMemo(() => {
+    return books.data.filter(
+      (book) => book.category.id === category.id && !book.deleted
+    );
+  }, [books.data, category.id]);
+
+  const formattedBook = useMemo(() => {
+    return filteredBooks.map((book) => {
+      const parsedDate = toDate(book.created_at);
+
+      return {
+        ...book,
+        formattedDate: format(parsedDate, 'dd/MM/y'),
+      };
+    });
+  }, [filteredBooks]);
 
   return (
     <Box component="div" className={styles.container}>
@@ -92,46 +122,26 @@ const CategoryList: React.FC = () => {
         }}
       ></PageHeader>
       <Box component="div" id="container">
-        <BookFilter>
-          <Input
-            type="text"
-            placeholder="Pesquisar..."
-            className={styles.input}
-          />
-        </BookFilter>
+        <CategoryTitle>{category.name}</CategoryTitle>
 
         <Box component="div" className={styles.booksWithoutCategory}>
-          <Card className={styles.card} onClick={handleBookDetail}>
-            <CardContent className={styles.cardContent}>
-              <img
-                src="https://images-na.ssl-images-amazon.com/images/I/51IA2UEqA-L._SX332_BO1,204,203,200_.jpg"
-                alt="capa"
-                className={styles.cardImg}
-              />
-              <Box component="div" className={styles.cardTextContainer}>
-                <strong className={styles.cardText}>
-                  Harry Potter e o Prisioneiro de Azkaban
-                </strong>
-                <span className={styles.cardCreatedAtText}>06/08/2020</span>
-              </Box>
-            </CardContent>
-          </Card>
-
-          <Card className={styles.card}>
-            <CardContent className={styles.cardContent}>
-              <img
-                src="https://images-na.ssl-images-amazon.com/images/I/51IA2UEqA-L._SX332_BO1,204,203,200_.jpg"
-                alt="capa"
-                className={styles.cardImg}
-              />
-              <Box component="div" className={styles.cardTextContainer}>
-                <strong className={styles.cardText}>
-                  Harry Potter e o Prisioneiro de Azkaban
-                </strong>
-                <span className={styles.cardCreatedAtText}>06/08/2020</span>
-              </Box>
-            </CardContent>
-          </Card>
+          {formattedBook.map((book) => (
+            <Card
+              className={styles.card}
+              onClick={() => handleBookDetail(book)}
+              key={book.id}
+            >
+              <CardContent className={styles.cardContent}>
+                <img src={book.img_url} alt="capa" className={styles.cardImg} />
+                <Box component="div" className={styles.cardTextContainer}>
+                  <strong className={styles.cardText}>{book.title}</strong>
+                  <span className={styles.cardCreatedAtText}>
+                    {book.formattedDate}
+                  </span>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
         </Box>
       </Box>
     </Box>

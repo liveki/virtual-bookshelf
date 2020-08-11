@@ -24,3 +24,14 @@ export const removeRequest = (id: string) =>
 
 export const removeSuccess = (data: Book[]) =>
   action(BooksTypes.REMOVE_SUCCESS, data);
+
+export const sortByTitleRequest = () =>
+  action(BooksTypes.SORT_BY_TITLE_REQUEST);
+
+export const sortByTitleSuccess = (data: Book[]) =>
+  action(BooksTypes.SORT_BY_TITLE_SUCCESS, data);
+
+export const sortByDateRequest = () => action(BooksTypes.SORT_BY_DATE_REQUEST);
+
+export const sortByDateSuccess = (data: Book[]) =>
+  action(BooksTypes.SORT_BY_DATE_SUCCESS, data);

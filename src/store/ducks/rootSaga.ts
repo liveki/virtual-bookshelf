@@ -14,6 +14,8 @@ export default function* rootSaga() {
     takeLatest(BooksTypes.LOAD_REQUEST, bookActions.load),
     takeLatest(BooksTypes.UPDATE_REQUEST, bookActions.save),
     takeLatest(BooksTypes.REMOVE_REQUEST, bookActions.remove),
+    takeLatest(BooksTypes.SORT_BY_TITLE_REQUEST, bookActions.sortByTitle),
+    takeLatest(BooksTypes.SORT_BY_DATE_REQUEST, bookActions.sortByDate),
     takeLatest(CommentsTypes.CREATE_COMMENT_REQUEST, commentActions.create),
     takeLatest(CommentsTypes.SAVE_COMMENT_REQUEST, commentActions.save),
     takeLatest(

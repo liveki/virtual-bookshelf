@@ -2,7 +2,7 @@ import React, { HTMLAttributes } from 'react';
 
 import { Header } from './styles';
 import { FaArrowLeft } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 interface headerProps extends HTMLAttributes<HTMLHeadElement> {
   description?: string;
@@ -14,6 +14,11 @@ const PageHeader: React.FC<headerProps> = ({
   backControl = false,
   children,
 }) => {
+  const history = useHistory();
+
+  const handleGoBack = () => {
+    history.goBack();
+  };
   return (
     <Header>
       <h1>Virtual Bookshelf</h1>
@@ -23,9 +28,9 @@ const PageHeader: React.FC<headerProps> = ({
         </span>
       )}
       {backControl && (
-        <Link to="/">
+        <button onClick={handleGoBack}>
           <FaArrowLeft size={30} />
-        </Link>
+        </button>
       )}
     </Header>
   );

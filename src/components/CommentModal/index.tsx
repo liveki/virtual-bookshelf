@@ -25,6 +25,9 @@ const useStyle = makeStyles(() =>
     modalContainer: {
       '& .MuiDialog-paperWidthSm': {
         width: '50%',
+        '@media (max-width:700px)': {
+          width: '100%',
+        },
       },
     },
     modalTitle: {
@@ -60,7 +63,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ value }) => {
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
-  const [body, setBody] = useState(value.body);
+  const [comment, setComment] = useState(value);
 
   const toggleModal = () => {
     setOpen(!open);
@@ -69,22 +72,17 @@ const CommentModal: React.FC<CommentModalProps> = ({ value }) => {
   const handleSaveComment = useCallback(() => {
     const { formattedDate, ...updateComment } = value;
 
-    updateComment.body = body;
+    updateComment.body = comment.body;
 
     dispatch(commentActions.saveCommentRequest(updateComment));
 
     setOpen(!open);
-  }, [body, dispatch, open, value]);
+  }, [comment.body, dispatch, open, value]);
 
   return (
-    <>
+    <div>
       <ToggleModalButton onClick={toggleModal}>
-        <FiEdit2
-          size={24}
-          style={{
-            marginLeft: '1.3rem',
-          }}
-        />
+        <FiEdit2 size={24} />
       </ToggleModalButton>
 
       <Dialog
@@ -101,8 +99,8 @@ const CommentModal: React.FC<CommentModalProps> = ({ value }) => {
         <DialogContent>
           <TextareaAutosize
             className={styles.modalTextArea}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
+            value={comment.body}
+            onChange={(e) => setComment({ ...comment, body: e.target.value })}
           />
         </DialogContent>
 
@@ -113,7 +111,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ value }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 };
 

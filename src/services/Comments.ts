@@ -77,27 +77,30 @@ export const save = (comment: Comment) => {
 export const remove = (comment: Comment) => {
   const { data: comments } = store.getState().comments;
   const JSONComments = localStorage.getItem('@VirtualBookshelf:comments');
-  const findIndex = comments.findIndex(
-    (findComment) => findComment.id === comment.book_id
-  );
 
   if (JSONComments) {
-    const comments = JSON.parse(JSONComments) as Comment[];
-    const findIndex = comments.findIndex(
+    const storageComments = JSON.parse(JSONComments) as Comment[];
+
+    const findIndex = storageComments.findIndex(
       (findComment) => findComment.id === comment.id
     );
 
     if (findIndex > -1) {
-      comments.slice(findIndex, 1);
+      storageComments[findIndex].deleted = true;
+
       localStorage.setItem(
         '@VirtualBookshelf:comments',
-        JSON.stringify([...comments])
+        JSON.stringify([...storageComments])
       );
     }
   }
 
-  if (findIndex > -1) {
-    comments.slice(findIndex, 1);
+  const findCommentIndex = comments.findIndex(
+    (findComment) => findComment.id === comment.id
+  );
+
+  if (findCommentIndex > -1) {
+    comments[findCommentIndex].deleted = true;
   }
 
   return comments;
@@ -111,4 +114,6 @@ export const load = () => {
 
     return comments;
   }
+
+  return [];
 };

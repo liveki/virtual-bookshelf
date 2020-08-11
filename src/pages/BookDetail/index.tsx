@@ -20,6 +20,7 @@ import { CommentDTO } from '../../services/Comments';
 import { toDate } from 'date-fns/esm';
 import { format } from 'date-fns';
 import CommentModal from '../../components/CommentModal';
+import DeleteCommentModal from '../../components/DeleteCommentModal';
 
 export interface LocationProps {
   formattedBook: BookProps;
@@ -44,13 +45,20 @@ const useStyle = makeStyles(() =>
     },
     bookContainer: {
       display: 'flex',
-      padding: '3rem 0',
+      marginTop: '3rem',
+      '@media (max-width:700px)': {
+        alignItems: 'center',
+      },
     },
     img: {
       width: '17.6rem',
       height: '30.3rem',
+      '@media (max-width:700px)': {
+        display: 'none',
+      },
     },
     bookDetail: {
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
       marginLeft: '4rem',
@@ -68,6 +76,10 @@ const useStyle = makeStyles(() =>
         font: '300 1.8rem Roboto',
         textAlign: 'justify',
         marginBottom: '1rem',
+      },
+      '@media (max-width:700px)': {
+        width: '100%',
+        marginLeft: '0',
       },
     },
     commentContainer: {
@@ -142,6 +154,16 @@ const useStyle = makeStyles(() =>
         font: '300 1.8rem Roboto',
       },
     },
+    select: {
+      marginBottom: '3rem',
+      border: '0',
+      borderRadius: '0.4rem',
+      background: '#DAA281',
+      outline: '0',
+      font: '400 1.8rem Roboto',
+      width: '15rem',
+      color: '#fff',
+    },
   })
 );
 
@@ -154,6 +176,7 @@ const BookDetail: React.FC = () => {
   const { categories, comments } = useSelector(
     (state: ApplicationState) => state
   );
+
   const [category, setCategory] = useState(formattedBook.category.id);
 
   const [bodyComment, setBodyComment] = useState('');
@@ -203,9 +226,11 @@ const BookDetail: React.FC = () => {
   }, [bodyComment, commentAuthor, dispatch, formattedBook.id]);
 
   const filteredComments = useMemo(() => {
-    return comments.data.filter(
-      (comment) => comment.book_id === formattedBook.id
+    const filtered = comments.data.filter(
+      (comment) => comment.book_id === formattedBook.id && !comment.deleted
     );
+
+    return filtered;
   }, [comments.data, formattedBook.id]);
 
   const formattedComments: Comment[] = useMemo(() => {
@@ -242,6 +267,7 @@ const BookDetail: React.FC = () => {
             <select
               value={category}
               onChange={(e) => handleCategoryUpdate(e.target.value)}
+              className={styles.select}
             >
               {categories.data.map((category) => (
                 <option value={category.id} key={category.id}>
@@ -303,15 +329,13 @@ const BookDetail: React.FC = () => {
                 <p>
                   <i>{comment.body}</i>
                 </p>
-                <ButtonsContainer>
+                <ButtonsContainer
+                  style={{
+                    marginBottom: '0',
+                  }}
+                >
                   <CommentModal value={comment} />
-                  <FiTrash2
-                    size={24}
-                    style={{
-                      color: '#FF0000',
-                      marginLeft: '1.3rem',
-                    }}
-                  />
+                  <DeleteCommentModal value={comment} />
                 </ButtonsContainer>
               </CardContent>
             </Card>

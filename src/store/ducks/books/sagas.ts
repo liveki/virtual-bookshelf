@@ -39,3 +39,21 @@ export function* remove(action: ActionType<typeof actions.removeRequest>) {
     console.log(err);
   }
 }
+
+export function* sortByTitle() {
+  try {
+    const response = yield call(bookServices.sortByTitle);
+    yield put(actions.sortByTitleSuccess(response));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function* sortByDate() {
+  try {
+    const response = yield call(bookServices.sortByDate);
+    yield put(actions.sortByDateSuccess(response));
+  } catch (err) {
+    console.log(err);
+  }
+}

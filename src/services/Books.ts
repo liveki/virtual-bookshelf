@@ -69,6 +69,7 @@ export const save = (book: Book) => {
 
 export const remove = (id: string) => {
   const { books } = store.getState();
+  console.log('entrei aqui');
 
   const findIndex = books.data.findIndex((book) => book.id === id);
 
@@ -79,7 +80,58 @@ export const remove = (id: string) => {
       JSON.stringify([...books.data])
     );
   }
-
-  console.log(books.data);
   return books.data;
+};
+
+export const sortByTitle = () => {
+  const { data: books } = store.getState().books;
+
+  const booksWithoutCategory = books.filter(
+    (book) => (book.category.name = 'none')
+  );
+  const wantToReadBooks = books.filter(
+    (book) => (book.category.name = 'wantToRead')
+  );
+  const readingBooks = books.filter((book) => (book.category.name = 'reading'));
+  const readBooks = books.filter((book) => (book.category.name = 'read'));
+
+  booksWithoutCategory.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  wantToReadBooks.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  readingBooks.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  readBooks.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  booksWithoutCategory.concat(wantToReadBooks, readingBooks, readBooks);
+
+  return booksWithoutCategory;
+};
+
+export const sortByDate = () => {
+  const { data: books } = store.getState().books;
+
+  books.sort((bookA, bookB) => {
+    if (bookA.created_at > bookB.created_at) return 1;
+    else if (bookA.created_at < bookB.created_at) return -1;
+    else return 0;
+  });
+
+  return books;
 };
