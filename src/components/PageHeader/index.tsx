@@ -2,7 +2,7 @@ import React, { HTMLAttributes } from 'react';
 
 import { Header } from './styles';
 import { FaArrowLeft } from 'react-icons/fa';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 interface headerProps extends HTMLAttributes<HTMLHeadElement> {
   description?: string;
