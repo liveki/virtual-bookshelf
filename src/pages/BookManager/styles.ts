@@ -9,5 +9,6 @@ export const Button = styled.button`
   background: #47bb53;
   font: 500 2rem Roboto;
   color: #fff;
+  outline: 0;
   cursor: pointer;
 `;

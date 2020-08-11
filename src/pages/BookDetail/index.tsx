@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
+import { Book as BookProps } from '../Home';
 import {
   makeStyles,
   createStyles,
@@ -10,6 +11,30 @@ import {
 import PageHeader from '../../components/PageHeader';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { ButtonsContainer, Button } from './styles';
+import { useLocation, useHistory } from 'react-router-dom';
+import { ApplicationState } from '../../store';
+import { useSelector, useDispatch } from 'react-redux';
+import * as bookActions from '../../store/ducks/books/actions';
+import * as commentActions from '../../store/ducks/comments/actions';
+import { CommentDTO } from '../../services/Comments';
+import { toDate } from 'date-fns/esm';
+import { format } from 'date-fns';
+import CommentModal from '../../components/CommentModal';
+import DeleteCommentModal from '../../components/DeleteCommentModal';
+
+export interface LocationProps {
+  formattedBook: BookProps;
+}
+
+export interface Comment {
+  id: string;
+  book_id: string;
+  created_at: number;
+  body: string;
+  author: string;
+  deleted: boolean;
+  formattedDate: string;
+}
 
 const useStyle = makeStyles(() =>
   createStyles({
@@ -20,13 +45,20 @@ const useStyle = makeStyles(() =>
     },
     bookContainer: {
       display: 'flex',
-      padding: '3rem 0',
+      marginTop: '3rem',
+      '@media (max-width:700px)': {
+        alignItems: 'center',
+      },
     },
     img: {
       width: '17.6rem',
       height: '30.3rem',
+      '@media (max-width:700px)': {
+        display: 'none',
+      },
     },
     bookDetail: {
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
       marginLeft: '4rem',
@@ -45,6 +77,10 @@ const useStyle = makeStyles(() =>
         textAlign: 'justify',
         marginBottom: '1rem',
       },
+      '@media (max-width:700px)': {
+        width: '100%',
+        marginLeft: '0',
+      },
     },
     commentContainer: {
       borderTop: '1px solid rgba(0, 0, 0, 0.1)',
@@ -62,6 +98,7 @@ const useStyle = makeStyles(() =>
         color: '#fff',
         font: '400 2rem Roboto',
         marginTop: '1.3rem',
+        cursor: 'pointer',
       },
     },
     input: {
@@ -117,49 +154,138 @@ const useStyle = makeStyles(() =>
         font: '300 1.8rem Roboto',
       },
     },
+    select: {
+      marginBottom: '3rem',
+      border: '0',
+      borderRadius: '0.4rem',
+      background: '#DAA281',
+      outline: '0',
+      font: '400 1.8rem Roboto',
+      width: '15rem',
+      color: '#fff',
+    },
   })
 );
 
 const BookDetail: React.FC = () => {
   const styles = useStyle();
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const { formattedBook } = useLocation<LocationProps>().state;
+  const { categories, comments } = useSelector(
+    (state: ApplicationState) => state
+  );
+
+  const [category, setCategory] = useState(formattedBook.category.id);
+
+  const [bodyComment, setBodyComment] = useState('');
+  const [commentAuthor, setCommentAuthor] = useState('');
+
+  const handleBookEdit = useCallback(
+    (id: string) => {
+      history.push(`/book-manager/${id}`);
+    },
+    [history]
+  );
+
+  const handleCategoryUpdate = useCallback(
+    (category_id: string) => {
+      const { formattedDate, ...updateBook } = formattedBook;
+
+      const findIndex = categories.data.findIndex(
+        (categoryItem) => categoryItem.id === category_id
+      );
+
+      if (findIndex > -1) {
+        updateBook.category = categories.data[findIndex];
+      }
+
+      dispatch(bookActions.saveRequest(updateBook));
+      setCategory(category_id);
+    },
+    [categories.data, formattedBook, dispatch]
+  );
+
+  const handleRemove = useCallback(
+    (id: string) => {
+      dispatch(bookActions.removeRequest(id));
+      history.push('/');
+    },
+    [dispatch, history]
+  );
+
+  const handlePostComment = useCallback(() => {
+    const comment: CommentDTO = {
+      author: commentAuthor,
+      body: bodyComment,
+      book_id: formattedBook.id,
+    };
+
+    dispatch(commentActions.createCommentRequest(comment));
+  }, [bodyComment, commentAuthor, dispatch, formattedBook.id]);
+
+  const filteredComments = useMemo(() => {
+    const filtered = comments.data.filter(
+      (comment) => comment.book_id === formattedBook.id && !comment.deleted
+    );
+
+    return filtered;
+  }, [comments.data, formattedBook.id]);
+
+  const formattedComments: Comment[] = useMemo(() => {
+    const data = filteredComments.map((comment) => {
+      const parsedDate = toDate(comment.created_at);
+      return {
+        ...comment,
+        formattedDate: format(parsedDate, 'dd/MM/Y'),
+      };
+    });
+
+    return data;
+  }, [filteredComments]);
+
   return (
     <Box component="div" className={styles.container}>
       <PageHeader backControl />
       <Box component="div" id="container">
         <Box component="div" className={styles.bookContainer}>
-          <img
-            src="https://images-na.ssl-images-amazon.com/images/I/91wJzyhRfkL.jpg"
-            alt="capa"
-            className={styles.img}
-          />
+          <img src={formattedBook.img_url} alt="capa" className={styles.img} />
           <Box component="div" className={styles.bookDetail}>
             <strong>Título:</strong>
-            <span>As crônicas de Nárnia</span>
+            <span>{formattedBook.title}</span>
 
             <strong>Descrição:</strong>
-            <p>
-              Viagens ao fim do mundo, criaturas fantásticas e batalhas épicas
-              entre o bem e o mal - o que mais um leitor poderia querer de um
-              livro? O livro que tem tudo isso é 'O leão, a feiticeira e o
-              guarda-roupa'.
-            </p>
+            <p>{formattedBook.description}</p>
 
             <strong>Autor:</strong>
-            <span>Clive Staples Lewis</span>
+            <span>{formattedBook.author}</span>
 
             <strong>Criado em:</strong>
-            <span>06/08/2020</span>
+            <span>{formattedBook.formattedDate}</span>
 
-            <strong>Categoria</strong>
-            <span>Estou lendo</span>
+            <select
+              value={category}
+              onChange={(e) => handleCategoryUpdate(e.target.value)}
+              className={styles.select}
+            >
+              {categories.data.map((category) => (
+                <option value={category.id} key={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
 
             <ButtonsContainer>
-              <Button>
+              <Button onClick={() => handleBookEdit(formattedBook.id)}>
                 Editar
                 <FiEdit2 size={25} />
               </Button>
 
-              <Button isDeleteType>
+              <Button
+                isDeleteType
+                onClick={() => handleRemove(formattedBook.id)}
+              >
                 Remover
                 <FiTrash2 size={25} />
               </Button>
@@ -172,95 +298,48 @@ const BookDetail: React.FC = () => {
             id="title"
             className={styles.input}
             placeholder="Digite seu nome..."
+            value={commentAuthor}
+            onChange={(e) => setCommentAuthor(e.target.value)}
           />
           <textarea
             className={styles.textArea}
             placeholder="Digite um comentário..."
+            value={bodyComment}
+            onChange={(e) => setBodyComment(e.target.value)}
           ></textarea>
-          <button>Comentar</button>
+          <button onClick={handlePostComment}>Comentar</button>
         </Box>
 
-        <span className={styles.commentCounter}>2 Comentários</span>
+        <span
+          className={styles.commentCounter}
+        >{`${formattedComments.length} Comentários`}</span>
 
         <Box component="div" className={styles.commentList}>
-          <Card className={styles.comment}>
-            <CardContent>
-              <Box component="div" className={styles.authorInfo}>
-                <strong>
-                  <i>Marlon Saldanha</i>
-                </strong>
-                <span>
-                  <i>06/08/2020</i>
-                </span>
-              </Box>
-              <p>
-                <i>
-                  "– Está também em nosso mundo? – perguntou Edmundo. – Estou.
-                  Mas tenho outro nome. Têm de aprender a conhecer-me por esse
-                  nome. Foi por isso que os levei a Nárnia, para que,
-                  conhecendo-me um pouco, venham a conhecer-me melhor." História
-                  maravilhosa. As referências bíblicas me encantaram. Super
-                  recomendo!
-                </i>
-              </p>
-              <ButtonsContainer>
-                <FiEdit2
-                  size={24}
+          {formattedComments.map((comment) => (
+            <Card className={styles.comment} key={comment.id}>
+              <CardContent>
+                <Box component="div" className={styles.authorInfo}>
+                  <strong>
+                    <i>{comment.author}</i>
+                  </strong>
+                  <span>
+                    <i>{comment.formattedDate}</i>
+                  </span>
+                </Box>
+                <p>
+                  <i>{comment.body}</i>
+                </p>
+                <ButtonsContainer
                   style={{
-                    color: '#959393',
+                    marginBottom: '0',
                   }}
-                />
-                <FiTrash2
-                  size={24}
-                  style={{
-                    color: '#FF0000',
-                    marginLeft: '1.3rem',
-                  }}
-                />
-              </ButtonsContainer>
-            </CardContent>
-          </Card>
-
-          <Card className={styles.comment}>
-            <CardContent>
-              <Box component="div" className={styles.authorInfo}>
-                <strong>
-                  <i>Larissa Mendes</i>
-                </strong>
-                <span>
-                  <i>30/05/2019</i>
-                </span>
-              </Box>
-              <p>
-                <i>
-                  Finalmente relançaram uma edição caprichada pra esse clássico
-                  da fantasia! Detalhe que ela é baseada na edição oficial
-                  completa em inglês, com a capa original e ilustrações
-                  coloridas. Uma dica: para compreender melhor a história, leia
-                  as crônicas em ordem de publicação - O Leão, a Feiticeira e o
-                  Guarda-Roupa (1950), Príncipe Caspian (1951), A Viagem do
-                  Peregrino da Alvorada (1952), A Cadeira de Prata (1953), O
-                  Cavalo e seu Menino (1954), O Sobrinho do Mago (1955), A
-                  Última Batalha (1956).
-                </i>
-              </p>
-              <ButtonsContainer>
-                <FiEdit2
-                  size={24}
-                  style={{
-                    color: '#959393',
-                  }}
-                />
-                <FiTrash2
-                  size={24}
-                  style={{
-                    color: '#FF0000',
-                    marginLeft: '1.3rem',
-                  }}
-                />
-              </ButtonsContainer>
-            </CardContent>
-          </Card>
+                >
+                  <CommentModal value={comment} />
+                  <DeleteCommentModal value={comment} />
+                </ButtonsContainer>
+              </CardContent>
+            </Card>
+          ))}
         </Box>
       </Box>
     </Box>

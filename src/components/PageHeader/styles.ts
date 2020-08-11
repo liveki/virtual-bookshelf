@@ -26,10 +26,20 @@ export const Header = styled.header`
     margin-top: 2rem;
   }
 
-  a {
+  button {
     position: absolute;
     left: 0;
     margin-left: 2.6rem;
     color: #fff;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    outline: none;
+  }
+
+  @media (max-width: 700px) {
+    h1 {
+      margin-left: 4rem;
+    }
   }
 `;
