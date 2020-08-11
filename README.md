@@ -6,7 +6,7 @@
 To install the dependencies, just execute one of the following commands inside the project folders:
 ```bash
 npm install
-# ou com yarn
+# or
 yarn
 ```
 
@@ -14,7 +14,7 @@ yarn
 To run the project, just execute one of the commands below:
 ```bash
 npm start
-# ou com yarn
+# or
 yarn start
 ```
 
