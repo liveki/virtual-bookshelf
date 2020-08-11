@@ -25,13 +25,26 @@ export const removeRequest = (id: string) =>
 export const removeSuccess = (data: Book[]) =>
   action(BooksTypes.REMOVE_SUCCESS, data);
 
-export const sortByTitleRequest = () =>
-  action(BooksTypes.SORT_BY_TITLE_REQUEST);
+export const sortByTitleASCRequest = () =>
+  action(BooksTypes.SORT_BY_TITLE_ASC_REQUEST);
 
-export const sortByTitleSuccess = (data: Book[]) =>
-  action(BooksTypes.SORT_BY_TITLE_SUCCESS, data);
+export const sortByTitleASCSuccess = (data: Book[]) =>
+  action(BooksTypes.SORT_BY_TITLE_ASC_SUCCESS, data);
 
-export const sortByDateRequest = () => action(BooksTypes.SORT_BY_DATE_REQUEST);
+export const sortByTitleDESCRequest = () =>
+  action(BooksTypes.SORT_BY_TITLE_DESC_REQUEST);
 
-export const sortByDateSuccess = (data: Book[]) =>
-  action(BooksTypes.SORT_BY_DATE_SUCCESS, data);
+export const sortByTitleDESCSuccess = (data: Book[]) =>
+  action(BooksTypes.SORT_BY_TITLE_DESC_SUCCESS, data);
+
+export const sortByDateASCRequest = () =>
+  action(BooksTypes.SORT_BY_DATE_ASC_REQUEST);
+
+export const sortByDateASCSuccess = (data: Book[]) =>
+  action(BooksTypes.SORT_BY_DATE_ASC_SUCCESS, data);
+
+export const sortByDateDESCRequest = () =>
+  action(BooksTypes.SORT_BY_DATE_DESC_REQUEST);
+
+export const sortByDateDESCSuccess = (data: Book[]) =>
+  action(BooksTypes.SORT_BY_DATE_DESC_SUCCESS, data);

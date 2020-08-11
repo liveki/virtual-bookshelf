@@ -40,18 +40,36 @@ const reducer: Reducer<BooksState> = (state = INITIAL_STATE, action) => {
       return { ...state, loading: true };
     case BooksTypes.REMOVE_SUCCESS:
       return { ...state, loading: false, error: false, data: action.payload };
-    case BooksTypes.SORT_BY_DATE_REQUEST:
+    case BooksTypes.SORT_BY_DATE_ASC_REQUEST:
       return { ...state, loading: true };
-    case BooksTypes.SORT_BY_DATE_SUCCESS:
+    case BooksTypes.SORT_BY_DATE_ASC_SUCCESS:
       return {
         ...state,
         loading: false,
         error: false,
         data: action.payload,
       };
-    case BooksTypes.SORT_BY_TITLE_REQUEST:
+    case BooksTypes.SORT_BY_DATE_DESC_REQUEST:
       return { ...state, loading: true };
-    case BooksTypes.SORT_BY_TITLE_SUCCESS:
+    case BooksTypes.SORT_BY_DATE_DESC_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: action.payload,
+      };
+    case BooksTypes.SORT_BY_TITLE_ASC_REQUEST:
+      return { ...state, loading: true };
+    case BooksTypes.SORT_BY_TITLE_ASC_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: action.payload,
+      };
+    case BooksTypes.SORT_BY_TITLE_DESC_REQUEST:
+      return { ...state, loading: true };
+    case BooksTypes.SORT_BY_TITLE_DESC_SUCCESS:
       return {
         ...state,
         loading: false,

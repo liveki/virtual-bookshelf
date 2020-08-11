@@ -40,19 +40,37 @@ export function* remove(action: ActionType<typeof actions.removeRequest>) {
   }
 }
 
-export function* sortByTitle() {
+export function* sortByTitleASC() {
   try {
-    const response = yield call(bookServices.sortByTitle);
-    yield put(actions.sortByTitleSuccess(response));
+    const response = yield call(bookServices.sortByTitleASC);
+    yield put(actions.sortByTitleASCSuccess(response));
   } catch (err) {
     console.log(err);
   }
 }
 
-export function* sortByDate() {
+export function* sortByTitleDESC() {
   try {
-    const response = yield call(bookServices.sortByDate);
-    yield put(actions.sortByDateSuccess(response));
+    const response = yield call(bookServices.sortByTitleDESC);
+    yield put(actions.sortByTitleDESCSuccess(response));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function* sortByDateASC() {
+  try {
+    const response = yield call(bookServices.sortByDateASC);
+    yield put(actions.sortByDateASCSuccess(response));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function* sortByDateDESC() {
+  try {
+    const response = yield call(bookServices.sortByDateDESC);
+    yield put(actions.sortByDateDESCSuccess(response));
   } catch (err) {
     console.log(err);
   }

@@ -1,26 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState } from '../../store';
 import { toDate, format } from 'date-fns';
+import { FaPlus, FaArrowRight } from 'react-icons/fa';
+
 import * as categoryActions from '../../store/ducks/categories/actions';
 import * as bookActions from '../../store/ducks/books/actions';
 import * as commentActions from '../../store/ducks/comments/actions';
+import { Category } from '../../store/ducks/categories/types';
 
 import PageHeader from '../../components/PageHeader';
-import {
-  Box,
-  Input,
-  makeStyles,
-  createStyles,
-  Theme,
-  Card,
-  CardContent,
-} from '@material-ui/core';
-import { BookFilter, Button, SearchFieldTitle } from './styles';
-import { FaPlus, FaArrowRight } from 'react-icons/fa';
-import { Link, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { Category } from '../../store/ducks/categories/types';
 import RadioFilterBook from '../../components/RadioFilterBook';
+
+import { Box, Input, Card, CardContent } from '@material-ui/core';
+
+import { BookFilter, Button, SearchFieldTitle, useStyle } from './styles';
 
 export interface Book {
   id: string;
@@ -33,113 +28,6 @@ export interface Book {
   img_url?: string;
   formattedDate: string;
 }
-
-const useStyle = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    input: {
-      width: '27.9rem',
-      background: '#CA9B6F',
-      borderRadius: '0.4rem',
-      color: '#fff',
-      fontFamily: 'Roboto',
-      fontWeight: 'normal',
-      fontSize: '2rem',
-      paddingLeft: '1.1rem',
-      marginTop: '-2.5rem',
-      margin: '0 auto',
-    },
-    card: {
-      background: '#FEE8CD',
-      display: 'flex',
-      alignItems: 'center',
-      width: '25.4rem',
-      height: '16.9rem',
-      transition: 'transform 0.2s',
-      cursor: 'pointer',
-      marginBottom: '3rem',
-      '&:hover': {
-        transform: 'translateY(-5px) translateX(5px)',
-      },
-    },
-    cardContent: {
-      display: 'flex',
-      alignItems: 'center',
-    },
-    cardImg: {
-      width: '8.2rem',
-      height: '15.1rem',
-    },
-    cardTextContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    cardText: {
-      font: '500 1.8rem Roboto',
-      color: '#7D4715',
-      marginLeft: '1.5rem',
-    },
-    cardCreatedAtText: {
-      font: '300 1.8rem Roboto',
-      color: '#7D4715',
-      marginTop: '2.9rem',
-      marginLeft: '1.5rem',
-    },
-    booksWithoutCategory: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginTop: '15.1rem',
-      marginBottom: '9.6rem',
-      flexWrap: 'wrap',
-    },
-    link: {
-      display: 'flex',
-      width: 'fit-content',
-      alignItems: 'center',
-      textDecoration: 'none',
-      color: '#7D4715',
-      font: '400 2rem Roboto',
-      fontWeight: 'bold',
-      marginBottom: '0.5rem',
-      '& svg': {
-        marginLeft: '1rem',
-      },
-    },
-    booksWantToReadContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      marginBottom: '4.6rem',
-    },
-    booksWantToReadContent: {
-      paddingTop: '2.6rem',
-      borderTop: '2px solid rgba(125, 71, 21, 0.2)',
-      display: 'flex',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      '@media (max-width:700px)': {
-        flexDirection: 'column',
-      },
-    },
-    buttonsContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '4rem 0',
-      '@media (max-width:700px)': {
-        flexDirection: 'column',
-        '& button': {
-          margin: '5rem 0',
-        },
-      },
-    },
-  })
-);
 
 const Home: React.FC = () => {
   const styles = useStyle();
@@ -225,8 +113,8 @@ const Home: React.FC = () => {
           <>
             <SearchFieldTitle>Resultado da busca:</SearchFieldTitle>
 
-            <Box component="div" className={styles.booksWantToReadContainer}>
-              <Box component="div" className={styles.booksWantToReadContent}>
+            <Box component="div" className={styles.booksContainer}>
+              <Box component="div" className={styles.booksContent}>
                 {researchResultBooks.map((book) => (
                   <Card
                     className={styles.card}
@@ -263,7 +151,7 @@ const Home: React.FC = () => {
               </Button>
             </div>
             {booksWithoutCategory.length > 0 && (
-              <Box component="div" className={styles.booksWantToReadContainer}>
+              <Box component="div" className={styles.booksContainer}>
                 <Link
                   to={{
                     pathname: '/category-list',
@@ -273,7 +161,7 @@ const Home: React.FC = () => {
                 >
                   Sem categoria <FaArrowRight size={20} />
                 </Link>
-                <Box component="div" className={styles.booksWantToReadContent}>
+                <Box component="div" className={styles.booksContent}>
                   {booksWithoutCategory.map((book) => (
                     <Card
                       className={styles.card}
@@ -305,7 +193,7 @@ const Home: React.FC = () => {
             )}
 
             {readingBooks.length > 0 && (
-              <Box component="div" className={styles.booksWantToReadContainer}>
+              <Box component="div" className={styles.booksContainer}>
                 <Link
                   to={{
                     pathname: '/category-list',
@@ -315,7 +203,7 @@ const Home: React.FC = () => {
                 >
                   Estou lendo <FaArrowRight size={20} />
                 </Link>
-                <Box component="div" className={styles.booksWantToReadContent}>
+                <Box component="div" className={styles.booksContent}>
                   {readingBooks.map((book) => (
                     <Card
                       className={styles.card}
@@ -347,7 +235,7 @@ const Home: React.FC = () => {
             )}
 
             {wantToReadBooks.length > 0 && (
-              <Box component="div" className={styles.booksWantToReadContainer}>
+              <Box component="div" className={styles.booksContainer}>
                 <Link
                   to={{
                     pathname: '/category-list',
@@ -357,7 +245,7 @@ const Home: React.FC = () => {
                 >
                   Vou ler <FaArrowRight size={20} />
                 </Link>
-                <Box component="div" className={styles.booksWantToReadContent}>
+                <Box component="div" className={styles.booksContent}>
                   {wantToReadBooks.map((book) => (
                     <Card
                       className={styles.card}
@@ -389,7 +277,7 @@ const Home: React.FC = () => {
             )}
 
             {readBooks.length > 0 && (
-              <Box component="div" className={styles.booksWantToReadContainer}>
+              <Box component="div" className={styles.booksContainer}>
                 <Link
                   to={{
                     pathname: '/category-list',
@@ -399,7 +287,7 @@ const Home: React.FC = () => {
                 >
                   Já li <FaArrowRight size={20} />
                 </Link>
-                <Box component="div" className={styles.booksWantToReadContent}>
+                <Box component="div" className={styles.booksContent}>
                   {readBooks.map((book) => (
                     <Card
                       className={styles.card}

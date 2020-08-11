@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { FiTrash2 } from 'react-icons/fi';
 
-import * as commentActions from '../../store/ducks/comments/actions';
+import * as bookActions from '../../store/ducks/books/actions';
 
 import {
   Dialog,
@@ -16,7 +16,7 @@ import { TransitionProps } from '@material-ui/core/transitions';
 
 import { Button, ToggleModalButton, useStyle } from './styles';
 
-import { Comment } from '../../pages/BookDetail';
+import { Book } from '../../pages/Home';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -26,17 +26,17 @@ const Transition = React.forwardRef(function Transition(
 });
 
 interface DeleteModalProps {
-  value: Comment;
+  value: Book;
 }
 
-const DeleteCommentModal: React.FC<DeleteModalProps> = ({ value }) => {
+const DeleteBookModal: React.FC<DeleteModalProps> = ({ value }) => {
   const [open, setOpen] = React.useState(false);
   const styles = useStyle();
 
   const dispatch = useDispatch();
 
   const handleRemoveComment = useCallback(() => {
-    dispatch(commentActions.removeCommentRequest(value));
+    dispatch(bookActions.removeRequest(value.id));
     setOpen(!open);
   }, [dispatch, value, open]);
 
@@ -47,6 +47,7 @@ const DeleteCommentModal: React.FC<DeleteModalProps> = ({ value }) => {
   return (
     <div>
       <ToggleModalButton onClick={toggleModal}>
+        Apagar
         <FiTrash2
           size={24}
           style={{
@@ -70,7 +71,7 @@ const DeleteCommentModal: React.FC<DeleteModalProps> = ({ value }) => {
             id="alert-dialog-description"
             className={styles.modalContentText}
           >
-            Deseja apagar este comentário?
+            Deseja apagar este livro?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -84,4 +85,4 @@ const DeleteCommentModal: React.FC<DeleteModalProps> = ({ value }) => {
   );
 };
 
-export default DeleteCommentModal;
+export default DeleteBookModal;

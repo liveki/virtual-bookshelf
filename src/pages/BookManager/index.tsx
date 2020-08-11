@@ -1,55 +1,16 @@
 import React, { useState, useCallback, useEffect, FormEvent } from 'react';
-import {
-  Box,
-  makeStyles,
-  createStyles,
-  InputLabel,
-  Input,
-} from '@material-ui/core';
-import PageHeader from '../../components/PageHeader';
-import * as bookActions from '../../store/ducks/books/actions';
-import { Button } from './styles';
-import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { ApplicationState } from '../../store';
+
+import * as bookActions from '../../store/ducks/books/actions';
 import { Category } from '../../store/ducks/categories/types';
 
-const useStyle = makeStyles(() =>
-  createStyles({
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    inputLabel: {
-      font: '500 2rem Roboto',
-      color: '#B5B5B5',
-      marginTop: '2rem',
-    },
-    input: {
-      width: '100%',
-      height: '5rem',
-      background: '#EFEFEF',
-      border: '1px solid rgba(0, 0, 0, 0.1)',
-      borderRadius: '0.4rem',
-      font: '500 2rem Roboto',
-      paddingLeft: '0.5rem',
-    },
-    textArea: {
-      width: '100%',
-      resize: 'vertical',
-      minHeight: '13.2rem',
-      maxHeight: '13.2rem',
-      background: '#EFEFEF',
-      border: '1px solid rgba(0, 0, 0, 0.1)',
-      borderRadius: '0.4rem',
-      font: '500 2rem Roboto',
-      paddingLeft: '0.5rem',
-      outline: 0,
-      paddingTop: '0.3rem',
-    },
-  })
-);
+import PageHeader from '../../components/PageHeader';
+
+import { Box, InputLabel, Input } from '@material-ui/core';
+
+import { Button, useStyle } from './styles';
 
 interface RouteParams {
   id: string;
@@ -65,6 +26,8 @@ const BookManager: React.FC = () => {
   const [category, setCategory] = useState<Category>({} as Category);
   const [deleted, setDeleted] = useState(false);
   const [imgUrl, setImgUrl] = useState('');
+
+  const [hasFilledFiels, setHasFilledFiels] = useState(false);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -131,6 +94,14 @@ const BookManager: React.FC = () => {
     ]
   );
 
+  useEffect(() => {
+    if (title && author && description) {
+      setHasFilledFiels(true);
+    } else {
+      setHasFilledFiels(false);
+    }
+  }, [author, description, title]);
+
   return (
     <Box component="div" className={styles.container}>
       <PageHeader description="Cadastre ou edite um livro." backControl />
@@ -170,7 +141,7 @@ const BookManager: React.FC = () => {
             id="author"
             className={styles.input}
             value={author}
-            onChange={(e) => setAuthor(e.target.value)}
+            onChange={(e) => setAuthor(e.currentTarget.value)}
           />
 
           <InputLabel htmlFor="imageUrl" className={styles.inputLabel}>
@@ -186,7 +157,13 @@ const BookManager: React.FC = () => {
             onChange={(e) => setImgUrl(e.target.value)}
           />
 
-          <Button type="submit">Salvar</Button>
+          <Button
+            type="submit"
+            disabled={!hasFilledFiels}
+            isFilled={hasFilledFiels}
+          >
+            Salvar
+          </Button>
         </form>
       </Box>
     </Box>

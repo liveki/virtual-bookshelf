@@ -1,8 +1,9 @@
 import styled, { css } from 'styled-components';
+import { shade } from 'polished';
 import { makeStyles, createStyles } from '@material-ui/core';
 
 interface ButtonProps {
-  isSaveType?: boolean;
+  isDeleteType?: boolean;
 }
 
 export const Button = styled.button<ButtonProps>`
@@ -16,18 +17,32 @@ export const Button = styled.button<ButtonProps>`
   cursor: pointer;
 
   ${(props) =>
-    props.isSaveType &&
+    props.isDeleteType &&
     css`
-      background: #17b21a;
+      background: #ff2626;
     `}
 `;
 
 export const ToggleModalButton = styled.button`
-  border: none;
-  color: #c3c3c3;
-  background: transparent;
-  margin-right: 0.5rem;
+  width: 11.3rem;
+  height: 4.2rem;
+  background: #f7f5f5;
+  border: 0;
+  box-shadow: 0 0.4rem 0.4rem rgba(0, 0, 0, 0.25);
+  border-radius: 0.4rem;
+  margin-left: 1.7rem;
+  font: 400 2rem Roboto;
+  cursor: pointer;
+  color: #ff2626;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
   outline: 0;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: ${shade(0.05, '#f7f5f5')};
+  }
 `;
 
 export const useStyle = makeStyles(() =>
@@ -35,9 +50,6 @@ export const useStyle = makeStyles(() =>
     modalContainer: {
       '& .MuiDialog-paperWidthSm': {
         width: '50%',
-        '@media (max-width:700px)': {
-          width: '100%',
-        },
       },
     },
     modalTitle: {
@@ -45,18 +57,8 @@ export const useStyle = makeStyles(() =>
         font: '500 1.8rem Roboto',
       },
     },
-    modalTextArea: {
-      width: '100%',
-      resize: 'vertical',
-      minHeight: '20.5rem',
-      maxHeight: '20.5rem',
-      background: '#EFEFEF',
-      border: '1px solid rgba(0, 0, 0, 0.1)',
-      borderRadius: '0.4rem',
-      font: '300 1.6rem Roboto',
-      paddingLeft: '0.5rem',
-      outline: 0,
-      paddingTop: '0.3rem',
+    modalContentText: {
+      font: '300 1.8rem Roboto',
     },
   })
 );

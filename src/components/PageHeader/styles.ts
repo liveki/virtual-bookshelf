@@ -9,12 +9,13 @@ export const Header = styled.header`
   height: 15.3rem;
   padding-top: 4.3rem;
 
-  h1 {
+  a {
     text-align: center;
     color: #fff;
     font-weight: bold;
     font-size: 3rem;
     font-family: Roboto;
+    text-decoration: none;
   }
 
   span {
@@ -38,7 +39,7 @@ export const Header = styled.header`
   }
 
   @media (max-width: 700px) {
-    h1 {
+    a {
       margin-left: 4rem;
     }
   }

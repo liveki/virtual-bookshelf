@@ -18,7 +18,9 @@ export const create = ({ author, description, title, img_url }: BookDTO) => {
     title,
     author,
     description,
-    img_url: img_url || null,
+    img_url:
+      img_url ||
+      'https://islandpress.org/sites/default/files/default_book_cover_2015.jpg',
     deleted: false,
     created_at: Date.now(),
     category: categories.data[0],
@@ -83,7 +85,7 @@ export const remove = (id: string) => {
   return books.data;
 };
 
-export const sortByTitle = () => {
+export const sortByTitleASC = () => {
   const { data: books } = store.getState().books;
 
   const booksWithoutCategory = books.filter(
@@ -124,12 +126,65 @@ export const sortByTitle = () => {
   return booksWithoutCategory;
 };
 
-export const sortByDate = () => {
+export const sortByTitleDESC = () => {
+  const { data: books } = store.getState().books;
+
+  const booksWithoutCategory = books.filter(
+    (book) => (book.category.name = 'none')
+  );
+  const wantToReadBooks = books.filter(
+    (book) => (book.category.name = 'wantToRead')
+  );
+  const readingBooks = books.filter((book) => (book.category.name = 'reading'));
+  const readBooks = books.filter((book) => (book.category.name = 'read'));
+
+  booksWithoutCategory.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  wantToReadBooks.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  readingBooks.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  readBooks.sort((bookA, bookB) => {
+    if (bookA.title.toUpperCase() < bookB.title.toUpperCase()) return 1;
+    else if (bookA.title.toUpperCase() > bookB.title.toUpperCase()) return -1;
+    else return 0;
+  });
+
+  booksWithoutCategory.concat(wantToReadBooks, readingBooks, readBooks);
+
+  return booksWithoutCategory;
+};
+
+export const sortByDateASC = () => {
   const { data: books } = store.getState().books;
 
   books.sort((bookA, bookB) => {
     if (bookA.created_at > bookB.created_at) return 1;
     else if (bookA.created_at < bookB.created_at) return -1;
+    else return 0;
+  });
+
+  return books;
+};
+
+export const sortByDateDESC = () => {
+  const { data: books } = store.getState().books;
+
+  books.sort((bookA, bookB) => {
+    if (bookA.created_at < bookB.created_at) return 1;
+    else if (bookA.created_at > bookB.created_at) return -1;
     else return 0;
   });
 

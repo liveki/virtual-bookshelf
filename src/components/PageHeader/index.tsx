@@ -1,8 +1,8 @@
 import React, { HTMLAttributes } from 'react';
+import { useHistory, Link } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 import { Header } from './styles';
-import { FaArrowLeft } from 'react-icons/fa';
-import { useHistory } from 'react-router-dom';
 
 interface headerProps extends HTMLAttributes<HTMLHeadElement> {
   description?: string;
@@ -21,7 +21,7 @@ const PageHeader: React.FC<headerProps> = ({
   };
   return (
     <Header>
-      <h1>Virtual Bookshelf</h1>
+      <Link to="/">Virtual Bookshelf</Link>
       {description && (
         <span>
           {description} {children}{' '}
